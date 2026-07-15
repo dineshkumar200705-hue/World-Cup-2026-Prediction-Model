@@ -1,4 +1,4 @@
-# ⚽ FIFA World Cup 2026 Prediction Model
+# FIFA World Cup 2026 Prediction Model
 
 A machine learning-based project designed to predict match outcomes for the **FIFA World Cup 2026**. The model analyzes historical match data, team statistics, FIFA rankings, recent performance, and other relevant features to estimate the probability of a **win, draw, or loss**.
 
@@ -7,7 +7,7 @@ A machine learning-based project designed to predict match outcomes for the **FI
 · [Live insight feed](https://cup26matches.com/en/live/)
 · [Interactive bracket simulator](https://cup26matches.com/en/simulator/)
 
-## 📌 Project Overview
+## Project Overview
 
 The FIFA World Cup 2026 Prediction Model uses data analysis and machine learning techniques to predict possible match results and tournament outcomes.
 

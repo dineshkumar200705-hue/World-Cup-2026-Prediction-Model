@@ -2,6 +2,11 @@
 
 A machine learning-based project designed to predict match outcomes for the **FIFA World Cup 2026**. The model analyzes historical match data, team statistics, FIFA rankings, recent performance, and other relevant features to estimate the probability of a **win, draw, or loss**.
 
+**▶ Live predictions (full 48-team, 50,000-simulation model):** **https://cup26matches.com**
+· [How it works / methodology](https://cup26matches.com/en/methodology/)
+· [Live insight feed](https://cup26matches.com/en/live/)
+· [Interactive bracket simulator](https://cup26matches.com/en/simulator/)
+
 ## 📌 Project Overview
 
 The FIFA World Cup 2026 Prediction Model uses data analysis and machine learning techniques to predict possible match results and tournament outcomes.
@@ -15,171 +20,59 @@ The main objectives of this project are to:
 * Simulate the FIFA World Cup 2026 tournament
 * Identify teams with a higher probability of winning the tournament
 
-## ✨ Features
+## Quick start
 
-* Historical football match data analysis
-* Data cleaning and preprocessing
-* Exploratory Data Analysis (EDA)
-* Team performance comparison
-* Feature engineering
-* Machine learning model training
-* Win, draw, and loss prediction
-* Match probability estimation
-* Model performance evaluation
-* World Cup 2026 tournament simulation
+No dependencies. Node 18+.
 
-## 🧠 Machine Learning Workflow
+```bash
+git clone https://github.com/dineshkumar200705-hue/world-cup-2026-prediction-model.git
+cd world-cup-2026-prediction-model
 
-The project follows these steps:
-
-1. Collect historical football match data
-2. Clean and preprocess the dataset
-3. Handle missing and duplicate values
-4. Perform exploratory data analysis
-5. Create relevant features
-6. Split the dataset into training and testing sets
-7. Train the machine learning model
-8. Evaluate the model's performance
-9. Predict FIFA World Cup 2026 match outcomes
-10. Simulate tournament results
-
-## 📊 Model Input Features
-
-The prediction model may use features such as:
-
-* FIFA ranking
-* Team ranking points
-* Recent match performance
-* Number of wins
-* Number of draws
-* Number of losses
-* Goals scored
-* Goals conceded
-* Goal difference
-* Head-to-head performance
-* Home advantage
-* Team form
-
-## 🎯 Prediction Output
-
-The model predicts:
-
-* Home Team Win
-* Draw
-* Away Team Win
+node predict.mjs brazil argentina      # head-to-head probabilities
+node predict.mjs usa mexico usa        # 3rd arg = home team (host bonus)
+node backtest.mjs                      # reproduce the accuracy numbers
+node calibrate.mjs                     # rebuild ratings from data/results.json
+```
 
 Example:
 
-| Team 1    | Team 2  | Predicted Result | Win Probability |
-| --------- | ------- | ---------------- | --------------: |
-| Argentina | France  | Argentina Win    |             55% |
-| Brazil    | Spain   | Draw             |             40% |
-| England   | Germany | England Win      |             52% |
+```
+$ node predict.mjs spain germany
 
-> The values shown above are examples and do not represent actual model predictions.
+  spain (Elo 2074)  vs  germany (Elo 1927)   [neutral]
 
-## 🛠️ Technologies Used
-
-* Python
-* NumPy
-* Pandas
-* Matplotlib
-* Scikit-learn
-* Jupyter Notebook
-
-## ⚙️ Installation
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/your-username/World-Cup-2026-Prediction-Model.git
+  spain            win   53.2%  ████████████████
+  draw                   26.8%  ████████
+  germany          win   20.0%  ██████
 ```
 
-### 2. Open the project directory
+## How it works
 
-```bash
-cd World-Cup-2026-Prediction-Model
-```
+1. **Team strength (Elo).** Each nation starts from a long-run prior, then is calibrated on
+   recent real internationals — wins over strong sides in important games move a rating more than
+   friendlies, and recent form outweighs old form. See [`calibrate.mjs`](./calibrate.mjs).
+2. **Each match (Dixon-Coles Poisson).** Ratings → expected goals → a Dixon-Coles bivariate
+   Poisson gives win/draw/loss probabilities. The Dixon-Coles correction fixes plain Poisson's
+   well-known under-count of low-scoring draws (0-0, 1-1). See [`elo.mjs`](./elo.mjs).
+3. **The tournament (Monte Carlo).** The live site plays all 104 matches **50,000 times** through
+   the real bracket to get championship & advancement odds — and, now the tournament is underway,
+   **locks every finished result** (real standings, real qualifiers, real bracket slots) and
+   simulates only what's left. Full write-up:
+   [cup26matches.com/methodology](https://cup26matches.com/en/methodology/).
 
-### 3. Create a virtual environment
+## Files
 
-```bash
-python -m venv venv
-```
-
-### 4. Activate the virtual environment
-
-For Windows:
-
-```bash
-venv\Scripts\activate
-```
-
-For macOS/Linux:
-
-```bash
-source venv/bin/activate
-```
-
-### 5. Install the required libraries
-
-```bash
-pip install -r requirements.txt
-```
-
-## ▶️ Usage
-
-Run the prediction script:
-
-```bash
-python src/prediction.py
-```
-
-If the project uses a Jupyter Notebook, run:
-
-```bash
-jupyter notebook
-```
-
-Then open:
-
-```text
-notebooks/world_cup_prediction.ipynb
-```
-
-## 📈 Model Evaluation
-
-The model can be evaluated using the following metrics:
-
-* Accuracy Score
-* Precision
-* Recall
-* F1 Score
-* Confusion Matrix
-* Log Loss
-
-Model performance:
-
-```text
-Accuracy: Add your model accuracy here
-Precision: Add your precision score here
-Recall: Add your recall score here
-F1 Score: Add your F1 score here
-```
-
-## 🔮 Future Improvements
-
-Future improvements may include:
-
-* Adding real-time FIFA ranking data
-* Including player performance statistics
-* Adding player injury information
-* Using expected goals (xG) data
-* Comparing multiple machine learning algorithms
-* Improving feature engineering
-* Using deep learning models
-* Developing an interactive prediction dashboard
-* Deploying the model as a web application
+| File | What |
+|---|---|
+| `elo.mjs` | The match model — Elo, Dixon-Coles τ, Poisson, `matchProb`, `sampleMatch` |
+| `calibrate.mjs` | Build calibrated ratings from `data/results.json` |
+| `backtest.mjs` | Walk-forward out-of-sample evaluation (RPS, log-loss, Brier, ECE + reliability curve) |
+| `predict.mjs` | CLI head-to-head predictor |
+| `track-record.mjs` | Regenerates the live 2026 track-record table in this README |
+| `data/results.json` | 913 real international results (Oct 2023 – Jun 2026) |
+| `data/elo-calibrated.json` | Calibrated Elo for the 48 finalists |
+| `data/wc2026-results.json` | Finished 2026 World Cup matches (feeds the track record) |
+| `data/model-backtest.json` | Saved backtest metrics |
 
 ## ⚠️ Disclaimer
 
